@@ -48,7 +48,7 @@ if ($row = $result->fetch_assoc()) {
     $msg = "⏳ " . $days . " days left before your reservation schedule.";
   } elseif ($days === 1) {
     $msg = "📅 1 day left before your reservation.";
-  } elseif ($days === 0 && $mins_diff <= 0) {
+  } elseif ($days === 0) {
     $msg = "🔔 Today is your reservation schedule! Please go to your allotted counter.";
   } elseif ($days < 0) {
     $msg = "✅ Your reservation has been successfully completed.";
@@ -67,33 +67,48 @@ if ($row = $result->fetch_assoc()) {
     $timeLabel = "Just now";
   }
 
-  $notifications[] = [
-    'message' => $msg,
-    'time' => $timeLabel
-  ];
-
-  // 🔹 Extra logic: ilang tao pa ang ahead
-  $countQuery = $conn->prepare("
-    SELECT COUNT(*) AS ahead 
-    FROM register 
-    WHERE counter = ? AND slot < ? AND slot IS NOT NULL
-  ");
-  $countQuery->bind_param("si", $counter, $slot);
-  $countQuery->execute();
-  $countResult = $countQuery->get_result();
-  $aheadData = $countResult->fetch_assoc();
-  $ahead = (int)$aheadData['ahead'];
-
-  if ($ahead === 0) {
+  // 🔹 Add first notification (for all except after reservation)
+  if ($days >= 0) {
     $notifications[] = [
-      'message' => "🚨 It's your turn now! Please proceed to Counter <b>" . htmlspecialchars($counter) . "</b>.",
-      'time' => "Just now"
+      'message' => $msg,
+      'time' => $timeLabel
     ];
-  } else {
+  } elseif ($days < 0) {
+    // completed reservation only
     $notifications[] = [
-      'message' => "👥 There are <b>{$ahead}</b> people ahead of you before your turn at Counter <b>" . htmlspecialchars($counter) . "</b>.",
-      'time' => "Updated recently"
+      'message' => $msg,
+      'time' => "Today"
     ];
+  }
+
+  // 🔹 Queue notification lalabas lang kung araw ng reservation
+  if ($days === 0) {
+    $countQuery = $conn->prepare("
+      SELECT COUNT(*) AS ahead 
+      FROM register 
+      WHERE counter = ? AND slot < ? AND slot IS NOT NULL
+    ");
+    $countQuery->bind_param("si", $counter, $slot);
+    $countQuery->execute();
+    $countResult = $countQuery->get_result();
+    $aheadData = $countResult->fetch_assoc();
+    $ahead = (int)$aheadData['ahead'];
+
+    // 5 minutes per student
+    $estimated_wait = $ahead * 5; // minutes
+    $estimated_time = date("h:i A", strtotime("+$estimated_wait minutes"));
+
+    if ($ahead === 0) {
+      $notifications[] = [
+        'message' => "🚨 It's your turn now! Please proceed to Counter <b>" . htmlspecialchars($counter) . "</b>.",
+        'time' => "Just now"
+      ];
+    } else {
+      $notifications[] = [
+        'message' => "👥 There are <b>{$ahead}</b> people ahead of you before your turn at Counter <b>" . htmlspecialchars($counter) . "</b>.<br>⏱ Estimated waiting time: <b>{$estimated_wait}</b> minutes (around <b>{$estimated_time}</b>).",
+        'time' => "Updated recently"
+      ];
+    }
   }
 }
 ?>
@@ -123,13 +138,6 @@ if ($row = $result->fetch_assoc()) {
     .profile-dropdown h3 { margin: 5px 0; font-size: 18px; color: #000; }
     .profile-dropdown p { margin: 0; font-size: 14px; color: #666; }
 
-    .profile-dropdown button {
-      background: #7b1113;
-      border: none;
-      cursor: pointer;
-      position: relative;
-      color: white;
-    }
     .logout-btn {
       margin-top: 12px;
       border: 1px solid #000;
@@ -210,6 +218,11 @@ if ($row = $result->fetch_assoc()) {
   </main>
 
   <script>
+    // 🔁 Auto-refresh every 60 seconds
+    setInterval(() => {
+      location.reload();
+    }, 60000); // 1 minute
+
     const logoBtn = document.getElementById('logoButton');
     const dropdown = document.getElementById('profileDropdown');
     logoBtn.addEventListener('click', () => dropdown.classList.toggle('active'));
