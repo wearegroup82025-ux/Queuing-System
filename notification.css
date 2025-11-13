@@ -1,0 +1,177 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+}
+
+/* 🔹 Header */
+.header {
+  background-color: #800000; /* BulSU maroon */
+  padding: 15px 25px;
+  color: white;
+  position: relative;
+}
+
+.header .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .header img {
+      width: 120px;
+      height: auto;
+      transition: transform 0.2s ease;
+    }
+
+    .header button:hover img {
+      transform: scale(1.05);
+    }
+
+/* 🔹 Logo + Title */
+.logo {
+  font-size: 20px;
+  font-weight: bold;
+  color: white;
+}
+
+.logo1 img {
+  height: 60px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+/* 🔹 Nav Links */
+.nav-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 13px;
+}
+
+.nav-links li a {
+  text-decoration: none;
+  color: white;
+  font-weight: bold;
+  padding: 8px 15px;
+  border-radius: 5px;
+  transition: 0.3s;
+}
+
+.nav-links li a:hover,
+.nav-links li a.active {
+  background-color: #ffcc00; /* BulSU Gold */
+  color: #333;
+}
+
+/* 🔹 Hamburger Button */
+.hamburger {
+  display: none;
+  font-size: 28px;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Main Notifications Section */
+main {
+  padding: 0% 40px 40px; /* top 20px, left/right 40px, bottom 40px */
+  background: #f4f4f4;
+  min-height: 100vh;
+}
+
+
+.notifications-box {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 700px;
+  margin: 0 auto;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.notifications-box h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.notification-item {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 15px;
+  margin-bottom: 15px;
+  background: #fafafa;
+}
+
+.notification-item .message {
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.notification-item .time {
+  font-size: 13px;
+  color: #777;
+}
+
+/* 🔹 Responsive Design */
+@media (max-width: 992px) {
+  .header .container {
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 768px) {
+  .hamburger {
+    display: block;
+  }
+
+  nav {
+    width: 100%;
+  }
+
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    background: #800000;
+    width: 100%;
+    text-align: left;
+    padding: 10px 0;
+  }
+
+  .nav-links.show {
+    display: flex;
+  }
+
+  .nav-links li a {
+    padding: 12px 20px;
+    display: block;
+  }
+
+}
+
+@media (max-width: 480px) {
+  .logo1 img {
+    height: 40px;
+  }
+
+  .logo {
+    font-size: 16px;
+  }
+
+  .nav-links li a {
+    font-size: 14px;
+  }
+
+}
